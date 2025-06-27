@@ -89,8 +89,7 @@ fig3 = px.violin(
     box=True,
     points="all",
     color='review_score',
-    title='Distribuição dos Dias de Entrega por Nota de Avaliação',
-    color_discrete_sequence=px.colors.sequential.Blues
+    title='Distribuição dos Dias de Entrega por Nota de Avaliação'
 )
 fig3.update_layout(showlegend=False)
 
@@ -126,8 +125,8 @@ with col4:
         fig_parcelas = px.histogram(
             parcelas,
             x='payment_installments',
-            nbins=12,
             title='Distribuição de Parcelas para Cartão de Crédito',
-            color_discrete_sequence=['lightskyblue']
+            color_discrete_sequence=px.colors.sequential.Blues,
+            nbins=12,
         )
         st.plotly_chart(fig_parcelas, use_container_width=True)
