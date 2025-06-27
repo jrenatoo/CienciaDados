@@ -120,14 +120,19 @@ with col4:
 
     if mostrar_parcelas:
         parcelas = order_payments[order_payments['payment_type'] == 'credit_card']
-        parcelas = parcelas[parcelas['payment_installments'].between(1, 12)]
+        parcelas = parcelas[parcelas['payment_installments'] <= 12]
 
-        fig_parcelas = px.histogram(
-            parcelas,
-            x='payment_installments',
+        parcelas_contagem = parcelas['payment_installments'].value_counts().reset_index()
+        parcelas_contagem.columns = ['Parcelas', 'Quantidade']
+        parcelas_contagem = parcelas_contagem.sort_values('Parcelas')
+
+        fig_parcelas = px.bar(
+            parcelas_contagem,
+            x='Parcelas',
+            y='Quantidade',
             title='Distribuição de Parcelas para Cartão de Crédito',
-            color='payment_installments',
-            color_discrete_sequence=px.colors.sequential.Blues
+            color='Parcelas',
+            color_continuous_scale=px.colors.sequential.Blues
         )
-        fig_parcelas.update_layout(coloraxis_showscale=False)
+        fig_parcelas.update_layout(showlegend=False)
         st.plotly_chart(fig_parcelas, use_container_width=True)
