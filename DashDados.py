@@ -91,21 +91,22 @@ orders_reviews['order_delivered_customer_date'] = pd.to_datetime(orders_reviews[
 orders_reviews['delivery_days'] = (orders_reviews['order_delivered_customer_date'] - orders_reviews['order_purchase_timestamp']).dt.days
 
 # --- Gráfico 3: Violin Plot ---
-fig3, ax = plt.subplots(figsize=(8, 6))
-sns.violinplot(
-    x=orders_reviews['review_score'],
-    y=orders_reviews['delivery_days'],
-    ax=ax
+fig3 = px.violin(
+    orders_reviews,
+    x='review_score',
+    y='delivery_days',
+    box=True,
+    points="all",
+    color='review_score',
+    title='Distribuição dos Dias de Entrega por Nota de Avaliação'
 )
-
-ax.set_title('Distribuição dos Dias de Entrega por Nota de Avaliação')
-ax.set_xlabel('Nota de Avaliação')
-ax.set_ylabel('Dias para Entrega')
-
+fig3.update_layout(showlegend=False)
 # --- Layout linha 2 ---
+# --- Layout linha 2 de 2x2 ---
 col3, col4 = st.columns(2)
+
 with col3:
     st.write("### Dias de Entrega por Nota de Avaliação")
-    st.pyplot(fig3)
+    st.plotly_chart(fig3, use_container_width=True)
 
 
