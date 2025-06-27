@@ -14,7 +14,6 @@ st.set_page_config(page_title="Dashboard: Brazilian E-Commerce Public Dataset", 
 st.title('Análise de Dados sobre o Comércio digital no Brasil')
 st.markdown("O dataset 'Brazilian E-Commerce Public Dataset by Olist' contém informações de mais de 100 pedidos realizados entre 2016 e 2018.")
 
-# Função para carregar os dados
 
 st.set_page_config(page_title="Dashboard Olist", layout="wide")
 
