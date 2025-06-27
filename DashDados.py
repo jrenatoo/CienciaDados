@@ -42,6 +42,40 @@ col1.metric("Total de Pedidos", len(orders))
 col2.metric("Clientes Únicos", customers["customer_unique_id"].nunique())
 col3.metric("Total de Vendedores", sellers["seller_id"].nunique())
 
-# Exibe tabela inicial
-st.subheader("Pedidos")
-st.dataframe(orders.head())
+# --- Gráfico 1: Pedidos por estado ---
+pedidos_estado = orders.merge(customers, on='customer_id')
+pedidos_estado = pedidos_estado['customer_state'].value_counts().reset_index()
+pedidos_estado.columns = ['Estado', 'Total de Pedidos']
+
+fig1 = px.bar(
+    pedidos_estado,
+    x='Estado',
+    y='Total de Pedidos',
+    title="Total de Pedidos por Estado",
+    color_discrete_sequence=["lightskyblue"]
+)
+
+# --- Gráfico 2: Pedidos por mês ---
+orders['order_purchase_timestamp'] = pd.to_datetime(orders['order_purchase_timestamp'])
+pedidos_mes = orders.set_index('order_purchase_timestamp').resample('M').order_id.count().reset_index()
+pedidos_mes.columns = ['Data', 'Total de Pedidos']
+
+fig2 = px.line(
+    pedidos_mes,
+    x='Data',
+    y='Total de Pedidos',
+    title="Evolução Mensal de Pedidos",
+    markers=True
+)
+
+# --- Layout 2 colunas (linha 1 de 2x2) ---
+st.subheader("📊 Visão Geral de Pedidos")
+
+col1, col2 = st.columns(2)
+with col1:
+    st.write("### Total de Pedidos por Estado")
+    st.plotly_chart(fig1, use_container_width=True)
+
+with col2:
+    st.write("### Evolução Mensal de Pedidos")
+    st.plotly_chart(fig2, use_container_width=True)
