@@ -115,10 +115,7 @@ with col4:
     st.write("### Tipos de Pagamento")
     st.plotly_chart(fig4, use_container_width=True)
 
-    st.markdown("Clique abaixo para visualizar detalhes do parcelamento no cartão de crédito:")
-    mostrar_credito = st.checkbox("Mostrar parcelas do cartão de crédito")
-
-    if mostrar_credito:
+    if st.checkbox("Clique para visualizar detalhes do parcelamento no cartão de crédito"):
         parcelas = order_payments[order_payments['payment_type'] == 'credit_card']
         fig_parcelas = px.histogram(
             parcelas,
