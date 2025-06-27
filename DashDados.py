@@ -8,16 +8,12 @@ import seaborn as sns
 import zipfile 
 import os
 
-
 # Configuração básica da página
-st.set_page_config(page_title="Dashboard: Brazilian E-Commerce Public Dataset", page_icon="🇧🇷")
+st.set_page_config(page_title="Dashboard: Brazilian E-Commerce Public Dataset", page_icon="🇧🇷", layout="wide")
 
 # Título e introdução
-st.title('Análise de Dados sobre o Comércio digital no Brasil 🇧🇷')
-st.markdown("O dataset 'Brazilian E-Commerce Public Dataset by Olist' contém informações de mais de 100 pedidos realizados entre 2016 e 2018.")
-
-
-st.set_page_config(page_title="Dashboard Olist", layout="wide")
+st.title('Análise de Dados sobre o Comércio digital no Brasil🇧🇷')
+st.markdown("O dataset 'Brazilian E-Commerce Public Dataset by Olist' contém informações de mais de 100 mil pedidos realizados entre 2016 e 2018.")
 
 @st.cache_data
 def carregar_dados():
@@ -39,7 +35,6 @@ orders, customers, order_items, order_payments, order_reviews, products, sellers
 
 # Interface
 col1, col2, col3 = st.columns(3)
-
 col1.metric("Total de Pedidos", len(orders))
 col2.metric("Clientes Únicos", customers["customer_unique_id"].nunique())
 col3.metric("Total de Vendedores", sellers["seller_id"].nunique())
@@ -70,9 +65,7 @@ fig2 = px.line(
     markers=True
 )
 
-# --- Layout 2 colunas (linha 1 de 2x2) ---
 st.subheader("📊 Visão Geral de Pedidos")
-
 col1, col2 = st.columns(2)
 with col1:
     st.write("### Total de Pedidos por Estado")
@@ -82,15 +75,12 @@ with col2:
     st.write("### Evolução Mensal de Pedidos")
     st.plotly_chart(fig2, use_container_width=True)
 
-# --- Preparar dados para gráfico de violino ---
+# --- Gráfico 3: Violin Plot ---
 orders_reviews = orders.merge(order_reviews[['order_id', 'review_score']], on='order_id')
-
 orders_reviews['order_purchase_timestamp'] = pd.to_datetime(orders_reviews['order_purchase_timestamp'])
 orders_reviews['order_delivered_customer_date'] = pd.to_datetime(orders_reviews['order_delivered_customer_date'])
-
 orders_reviews['delivery_days'] = (orders_reviews['order_delivered_customer_date'] - orders_reviews['order_purchase_timestamp']).dt.days
 
-# --- Gráfico 3: Violin Plot ---
 fig3 = px.violin(
     orders_reviews,
     x='review_score',
@@ -101,12 +91,40 @@ fig3 = px.violin(
     title='Distribuição dos Dias de Entrega por Nota de Avaliação'
 )
 fig3.update_layout(showlegend=False)
-# --- Layout linha 2 ---
-# --- Layout linha 2 de 2x2 ---
+
+# --- Gráfico 4: Pagamento + Parcelas ---
+pagamentos = order_payments['payment_type'].value_counts().reset_index()
+pagamentos.columns = ['Tipo de Pagamento', 'Quantidade']
+
+fig4 = px.pie(
+    pagamentos,
+    names='Tipo de Pagamento',
+    values='Quantidade',
+    title='Distribuição dos Tipos de Pagamento',
+    color_discrete_sequence=px.colors.sequential.RdBu
+)
+
+# Layout linha 2
 col3, col4 = st.columns(2)
 
 with col3:
     st.write("### Dias de Entrega por Nota de Avaliação")
     st.plotly_chart(fig3, use_container_width=True)
 
+with col4:
+    st.write("### Tipos de Pagamento")
+    st.plotly_chart(fig4, use_container_width=True)
 
+    st.markdown("Clique abaixo para visualizar detalhes do parcelamento no cartão de crédito:")
+    mostrar_credito = st.checkbox("Mostrar parcelas do cartão de crédito")
+
+    if mostrar_credito:
+        parcelas = order_payments[order_payments['payment_type'] == 'credit_card']
+        fig_parcelas = px.histogram(
+            parcelas,
+            x='payment_installments',
+            nbins=20,
+            title='Distribuição de Parcelas para Cartão de Crédito',
+            color_discrete_sequence=['indianred']
+        )
+        st.plotly_chart(fig_parcelas, use_container_width=True)
