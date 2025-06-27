@@ -62,7 +62,8 @@ fig2 = px.line(
     x='Data',
     y='Total de Pedidos',
     title="Evolução Mensal de Pedidos",
-    markers=True
+    markers=True,
+    color_discrete_sequence=["lightskyblue"]
 )
 
 st.subheader("📊 Visão Geral de Pedidos")
@@ -88,7 +89,8 @@ fig3 = px.violin(
     box=True,
     points="all",
     color='review_score',
-    title='Distribuição dos Dias de Entrega por Nota de Avaliação'
+    title='Distribuição dos Dias de Entrega por Nota de Avaliação',
+    color_discrete_sequence=px.colors.sequential.Blues
 )
 fig3.update_layout(showlegend=False)
 
@@ -101,7 +103,7 @@ fig4 = px.pie(
     names='Tipo de Pagamento',
     values='Quantidade',
     title='Distribuição dos Tipos de Pagamento',
-    color_discrete_sequence=px.colors.sequential.RdBu
+    color_discrete_sequence=px.colors.sequential.Blues
 )
 
 # Layout linha 2
@@ -115,13 +117,17 @@ with col4:
     st.write("### Tipos de Pagamento")
     st.plotly_chart(fig4, use_container_width=True)
 
-    if st.checkbox("Clique para visualizar detalhes do parcelamento no cartão de crédito"):
+    mostrar_parcelas = st.checkbox("Clique para visualizar detalhes do parcelamento no cartão de crédito")
+
+    if mostrar_parcelas:
         parcelas = order_payments[order_payments['payment_type'] == 'credit_card']
+        parcelas = parcelas[parcelas['payment_installments'] <= 12]  # Limita até 12 parcelas
+
         fig_parcelas = px.histogram(
             parcelas,
             x='payment_installments',
-            nbins=20,
+            nbins=12,
             title='Distribuição de Parcelas para Cartão de Crédito',
-            color_discrete_sequence=['indianred']
+            color_discrete_sequence=['lightskyblue']
         )
         st.plotly_chart(fig_parcelas, use_container_width=True)
