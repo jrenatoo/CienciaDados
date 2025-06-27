@@ -3,6 +3,8 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 import zipfile 
 import os
 
@@ -79,3 +81,31 @@ with col1:
 with col2:
     st.write("### Evolução Mensal de Pedidos")
     st.plotly_chart(fig2, use_container_width=True)
+
+# --- Preparar dados para gráfico de violino ---
+orders_reviews = orders.merge(order_reviews[['order_id', 'review_score']], on='order_id')
+
+orders_reviews['order_purchase_timestamp'] = pd.to_datetime(orders_reviews['order_purchase_timestamp'])
+orders_reviews['order_delivered_customer_date'] = pd.to_datetime(orders_reviews['order_delivered_customer_date'])
+
+orders_reviews['delivery_days'] = (orders_reviews['order_delivered_customer_date'] - orders_reviews['order_purchase_timestamp']).dt.days
+
+# --- Gráfico 3: Violin Plot ---
+fig3, ax = plt.subplots(figsize=(8, 6))
+sns.violinplot(
+    x=orders_reviews['review_score'],
+    y=orders_reviews['delivery_days'],
+    ax=ax
+)
+
+ax.set_title('Distribuição dos Dias de Entrega por Nota de Avaliação')
+ax.set_xlabel('Nota de Avaliação')
+ax.set_ylabel('Dias para Entrega')
+
+# --- Layout linha 2 ---
+col3, col4 = st.columns(2)
+with col3:
+    st.write("### Dias de Entrega por Nota de Avaliação")
+    st.pyplot(fig3)
+
+
